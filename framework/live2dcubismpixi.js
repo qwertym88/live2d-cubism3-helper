@@ -322,7 +322,7 @@ var LIVE2DCUBISMPIXI;
             this._groups = groups;
             return this;
         };
-        ModelBuilder.prototype.buildFromModel3Json = function (loader, model3Obj, callbackFunc,t) {
+        ModelBuilder.prototype.buildFromModel3Json = function (loader, model3Obj, callbackFunc) {
             var _this = this;
             var model3URL = model3Obj.url;
             var modelDir = model3URL.substring(0, model3URL.lastIndexOf("/") + 1);
@@ -353,7 +353,7 @@ var LIVE2DCUBISMPIXI;
                 if (typeof (resources['userdata']) !== "undefined")
                     _this.setUserData3Json(resources['userdata'].data);
                 var model = _this.build();
-                callbackFunc(model,t);
+                callbackFunc(model);
             });
         };
         ModelBuilder.prototype.build = function () {
