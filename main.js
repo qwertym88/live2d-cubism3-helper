@@ -70,6 +70,7 @@ live2dModel.prototype.load = function(path,define){
         }
     };
 };
+//更新模型大小
 live2dModel.prototype.resize = function(w=this.modelDefine.width,h=this.modelDefine.height,s=this.modelDefine.scale,_x=this.modelDefine.model_x,_y=this.modelDefine.model_y){
     this._app.view.style.width = w + "px";
     this._app.view.style.height = h + "px";
@@ -78,6 +79,7 @@ live2dModel.prototype.resize = function(w=this.modelDefine.width,h=this.modelDef
     this._model.scale = new PIXI.Point(s,s);
     this._model.masks.resize(this._app.view.width, this._app.view.height);
 };
+//////以下为内部函数
 live2dModel.prototype._initModel = function(data,path){
 	let model3Obj = {data:data,url: path.substr(0, path.lastIndexOf('/') + 1)};
     //清除loader内的内容，并清除缓存中的内容
@@ -96,42 +98,32 @@ live2dModel.prototype._initModel = function(data,path){
         .on("start", loadStartHandler)
         .on("complete", loadCompleteHandler),
       model3Obj,
-      this._setModel,
-      this//一个很奇葩的代码，惭愧啊。主要是实在没想到什么办法传递this了
+      this._setModel.bind(this)
     );  
 };
-live2dModel.prototype._setModel = function(model,_this){//_this=this的套路
-	if(_this._app != null){_this._app.stop();}
-    _this._app = new PIXI.Application(_this.modelDefine.width,_this.modelDefine.height, {transparent: true ,view:_this.canvas});
-    _this._app.stage.addChild(model);
-    _this._app.stage.addChild(model.masks);
-    _this._model=model;//无用代码，方便未来
+live2dModel.prototype._setModel = function(model){//
+	if(this._app != null){this._app.stop();}
+    this._app = new PIXI.Application(this.modelDefine.width,this.modelDefine.height, {transparent: true ,view:this.canvas});
+    this._app.stage.addChild(model);
+    this._app.stage.addChild(model.masks);
+    this._model=model;//无用代码，方便未来
 
     //加载动作
-    _this.motionHandler._setmotion(model,PIXI.loader.resources);
+    this.motionHandler._setmotion(model,PIXI.loader.resources);
 
     //设置鼠标动作
-    _setMouseEvent(_this);
+    _setMouseEvent(this);
     
     //将模型放大到指定大小
-    _this.resize();
-    // window.onresize=function(event){
-    //     console.log('aaaa');
-    //     if (event === void 0) { event = null; }
-    //     _this._app.view.style.width = modelDefine.modelWidth + "px";
-    //     _this._app.view.style.height = modelDefine.modelHeight + "px";
-    //     _this._app.renderer.resize(modelDefine.modelWidth, height);
-    //     model.position = new PIXI.Point(modelDefine.modelWidth/2 + modelDefine.model_x, modelDefine.modelHeight/2 + modelDefine.model_y);
-    //     model.scale = new PIXI.Point(modelDefine.scale,modelDefine.scale);
-    //     model.masks.resize(app.view.width, app.view.height);
-    // };
+    this.resize();
+    
     
 };
 
 ////////////////有点重要的函数
 //处理鼠标事件的
-function _setMouseEvent (_this) {
-    //眼睛跟随鼠标
+function _setMouseEvent (_this) {//无法避免_this=this的套路
+    //////////////眼睛跟随鼠标
     var rect = _this.canvas.getBoundingClientRect();
     var mouse_on=false;
     var resetTime=1000;//转回直视的时间，随便改
@@ -217,6 +209,7 @@ function _setMouseEvent (_this) {
         }       
     });
 
+    ///////点击事件
     var last_x,last_y;
     _this.canvas.onmousedown=function(e){
         last_x=mouse_x,last_y=mouse_y;
@@ -236,12 +229,6 @@ function _setMouseEvent (_this) {
 
 
 //////////MotionHandler兼职处理语音,最终决定所有与动作相关的都在这里
-/*
-虽说原来的有，但还是自己写好
-强烈吐槽this._model.animator.getLayer('motion')，里头有个什么stop的，停止了后疯狂
-调用回调，而且实际意义也不大
-有个isPlay的，事实上动作结束后它仍然是true，仅仅是play和stop中的一个跑腿的
-*/
 var MotionHandler=function () {
 	this.motionGroups={};//动作分组
 	this.motionFile={};//动作文件
@@ -269,6 +256,7 @@ var MotionHandler=function () {
     this._breath;//只是一个占位置的
     this._eyeBlink;
 }
+//没啥用的东东
 MotionHandler.prototype.loadMotionGroup = function(key,motion,path){
 	if(key==null){
         console.log('no key find');
@@ -290,7 +278,7 @@ MotionHandler.prototype.loadMotionGroup = function(key,motion,path){
         console.error('Not find motions in '+key);
     }
 };
-MotionHandler.prototype._setmotion = function(model,resources){
+MotionHandler.prototype._setmotion = function(model,resources){//初始化
 	this._model=model;
     for (let key in resources) {
         if(key.indexOf('motion') != -1){
@@ -302,11 +290,11 @@ MotionHandler.prototype._setmotion = function(model,resources){
         }
     }
     if(this.motionFile){
-        //console.log('aaa');
         this._model.animator.addLayer("motion", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1.0);
     }
-    this._c();
+    this._c();//初始化
 };
+//name->动作文件名，priority->优先级，高的优先触发
 MotionHandler.prototype.startMotion = function(name,priority=3){
 	if(this._onDisplay && priority<=this._priority){
 		//console.log('priority forbidden');
@@ -320,10 +308,12 @@ MotionHandler.prototype.startMotion = function(name,priority=3){
 		this._model.animator.getLayer('motion').play(this.motionFile[name].src);
 	}
 };
+//group->动作组名，将会触发组内随机一个动作
 MotionHandler.prototype.startRadomMotion = function(group){
     var a=Math.floor(Math.random()*100)%this.motionGroups[group].length;
     this.startMotion(this.motionGroups[group][a],2);
 };
+//mouse_x/y -> 鼠标绝对坐标（非全局跟随）
 MotionHandler.prototype.lookAt = function(mouse_x,mouse_y){
        if(this._priority==0){//最小的优先级
             let x = mouse_x - this._center_x;
@@ -342,7 +332,7 @@ MotionHandler.prototype.lookAt = function(mouse_x,mouse_y){
                 this._model.parameters.values[angle_y] = this._map(y,angle_y);
                 this._model.parameters.values[eye_x] = this._map(x,eye_x);
                 this._model.parameters.values[eye_y] = this._map(y,eye_y);
-            }else{
+            }else{//注意一下对y轴的处理
                 this._model.parameters.values[angle_x] = this._map((x+this.w/2)/this.w,angle_x);
                 this._model.parameters.values[angle_y] = this._map(1-(y+this.h/2)/this.h,angle_y);
                 this._model.parameters.values[eye_x] = this._map((x+this.w/2)/this.w,eye_x);
@@ -350,6 +340,7 @@ MotionHandler.prototype.lookAt = function(mouse_x,mouse_y){
             }
        }
 };
+//是否自动呼吸
 MotionHandler.prototype.breath = function(a=true){
     var bt=2000;//半口气的时间而已
     var step=50;//精度随便调
@@ -369,6 +360,7 @@ MotionHandler.prototype.breath = function(a=true){
         window.clearInterval(this._breath);
     }
 };
+是否自动眨眼
 MotionHandler.prototype.eyeBlink = function(a=true){
     if(a){
         var t=5000;//大概最少多久眨眼
@@ -393,13 +385,14 @@ MotionHandler.prototype.eyeBlink = function(a=true){
         window.clearInterval(this._eyeBlink);
     }
 };
+//id->点击区域id（artmesh的id），pointX/Y -> 鼠标绝对坐标
+//计算原理：遍历点的上下左右范围，判定点坐标x=模型中点坐标+相对位移*放大倍数（y为减）
+//模型坐标轴y轴向下为正？
 MotionHandler.prototype.isHit = function(id,pointX,pointY){
     let d=this._model.drawables;
-    //console.log('aaa');
     let index=d.ids.indexOf(id);
-    //console.log(index);
     let count=d.vertexCounts[index];
-    let vertices=d.vertexPositions[index];
+    let vertices=d.vertexPositions[index];//相对位移
     let left = vertices[0];
     let right = vertices[0];
     let top = vertices[1];
@@ -407,16 +400,16 @@ MotionHandler.prototype.isHit = function(id,pointX,pointY){
     for(let j = 1; j < count; ++j){
         let x = vertices[0 + j * 2];
         let y = vertices[0 + j * 2 + 1];
-        if(x < left){left = x;}// Min x      
+        if(x < left){left = x;}// 最左边的点相对中点x轴位移     
         if(x > right){right = x;}// Max x
-        if(y < top){top = y;}// Min y
+        if(y < top){top = y;}// 最上边的点相对中点x轴位移
         if(y > bottom){bottom = y;}// Max y
     }
     let tx=pointX;
     let ty=pointY;
     left=left*this._scale+this._center_x;
     right=right*this._scale+this._center_x;
-    top=-top*this._scale+this._center_y;//万分注意它这个模型上下是反的
+    top=-top*this._scale+this._center_y;//万分注意它这个模型上下是反的，所以是减去
     bottom=-bottom*this._scale+this._center_y;
     return ((left <= tx) && (tx <= right) && (top >= ty) && (ty >= bottom));
 };
