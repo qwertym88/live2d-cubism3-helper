@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <title>live2d</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+        <script src="pixi/pixi.min.js"></script>
+        <script src="http://cubism3.live2d.com.s3.amazonaws.com/sdk/js/live2dcubismcore.min.js"></script>
+        <script src="framework/live2dcubismframework.js"></script>
+        <script src="framework/live2dcubismpixi.js"></script>
+        <script src="main.js"></script>      
+    <style>
+    </style>
+    </head>
+	<body>
+		<div id="live2d">
+            <canvas style="border:1px solid black;"></canvas>
+        </div>
+    </body>
+    <script>
+    	var modelDefine={
+			modelPath:"./resource/lafei_4/lafei_4.model3.json",
+			//模型渲染的位置
+			target : '#live2d',
+			//模型偏移位置
+			model_x : 0,
+			model_y : 0,
+			//渲染模型的宽高
+			modelWidth : 600,//默认600
+			modelHeight : 600,//默认600
+			//渲染模型的比例
+			scale : 30,//默认30
+			//全局跟随鼠标
+			globalFollow:false//暂不支持全局跟随
+		}
+        var model=new live2dModel();
+        model.load("./resource/lafei_4/lafei_4.model3.json",modelDefine);
+  		////////////
+  		//loadModel();
+    </script>
+</html>
