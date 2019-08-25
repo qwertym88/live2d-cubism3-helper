@@ -360,7 +360,7 @@ MotionHandler.prototype.breath = function(a=true){
         window.clearInterval(this._breath);
     }
 };
-是否自动眨眼
+//是否自动眨眼
 MotionHandler.prototype.eyeBlink = function(a=true){
     if(a){
         var t=5000;//大概最少多久眨眼
