@@ -402,14 +402,12 @@ MotionHandler.prototype.isHit = function(id,pointX,pointY){
         let y = vertices[0 + j * 2 + 1];
         if(x < left){left = x;}// 最左边的点相对中点x轴位移     
         if(x > right){right = x;}// Max x
-        if(y < top){top = y;}// 最上边的点相对中点x轴位移
-        if(y > bottom){bottom = y;}// Max y
+        if(y > top){top = y;}// 最上边的点相对中点x轴位移
+        if(y < bottom){bottom = y;}// Max y
     }
-    let tx=pointX;
-    let ty=pointY;
     left=left*this._scale+this._center_x;
     right=right*this._scale+this._center_x;
     top=-top*this._scale+this._center_y;//万分注意它这个模型上下是反的，所以是减去
     bottom=-bottom*this._scale+this._center_y;
-    return ((left <= tx) && (tx <= right) && (top >= ty) && (ty >= bottom));
+    return ((left <= pointX) && (pointX <= right) && (bottom >= pointY) && (pointY >= top));
 };
