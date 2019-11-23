@@ -8,6 +8,9 @@ quick display for cubism3 models on your website
 1. 模型中点的位置（model.motionHandler._center_x/y）忘记加上偏移了（resize里的最后两个参数）
 2. 待补充
 
+11/23
+1. 打算完全推翻之前的设计，以简洁为主，特色在于方便地绑定回调函数吧。。
+
 ## TODO
 1. 动作与声音绑定（应该非常快），细节如口型匹配可暂不考虑
 2. 动作开始/结束事件（也应该非常快）
@@ -17,3 +20,4 @@ quick display for cubism3 models on your website
 
 ## 后记
 随缘更新中......（身不由己，由老师/作业量啊）
+啊，这个还是等到寒假再说吧，而且确实只能随缘了
