@@ -21,3 +21,7 @@ quick display for cubism3 models on your website
 ## 后记
 随缘更新中......（身不由己，由老师/作业量啊）
 啊，这个还是等到寒假再说吧，而且确实只能随缘了
+
+
+2022/2/22
+估计无限期搁置了
