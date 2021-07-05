@@ -23,5 +23,9 @@ quick display for cubism3 models on your website
 啊，这个还是等到寒假再说吧，而且确实只能随缘了
 
 
-2022/2/22
+2020/2/22
 估计无限期搁置了
+
+
+2021/7/5
+回来了
