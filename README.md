@@ -29,3 +29,6 @@ quick display for cubism3 models on your website
 
 2021/7/5
 回来了
+
+2022/7/9
+######此项目彻底荒废了。一是3.x版本的live2d已经很少了，二是实在没有什么兴趣。当作是黑历史+1吧。
